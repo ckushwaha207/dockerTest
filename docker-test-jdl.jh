@@ -1,0 +1,15 @@
+entity OS {
+	name String required
+    version String required
+    description String
+}
+
+entity Tool {
+	name String required
+    version String required
+    description String
+}
+
+relationship ManyToMany {
+	OS{tools} to Tool{os}
+}

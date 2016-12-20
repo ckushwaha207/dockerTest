@@ -1,0 +1,25 @@
+{
+    "dockerTestApp": {
+        "tool" : {
+            "home": {
+                "title": "Tools",
+                "createLabel": "Create a new Tool",
+                "createOrEditLabel": "Create or edit a Tool",
+                "search": "Search for Tool"
+            },
+            "created": "A new Tool is created with identifier {{ param }}",
+            "updated": "A Tool is updated with identifier {{ param }}",
+            "deleted": "A Tool is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Tool {{ id }}?"
+            },
+            "detail": {
+                "title": "Tool"
+            },
+            "name": "Name",
+            "version": "Version",
+            "description": "Description",
+            "os": "Os"
+        }
+    }
+}

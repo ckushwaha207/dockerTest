@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <!--
+        Added the constraints for entity OS.
+    -->
+    <changeSet id="20161220060728-2" author="jhipster">
+        
+        <addForeignKeyConstraint baseColumnNames="os_id"
+                                 baseTableName="os_tools"
+                                 constraintName="fk_os_tools_os_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="os"/>
+        <addForeignKeyConstraint baseColumnNames="tools_id"
+                                 baseTableName="os_tools"
+                                 constraintName="fk_os_tools_tools_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tool"/>
+        
+    </changeSet>
+</databaseChangeLog>
