@@ -4,6 +4,9 @@ import com.app.docker.DockerTestApp;
 
 import com.app.docker.domain.OS;
 import com.app.docker.repository.OSRepository;
+import com.app.docker.service.OSService;
+import com.app.docker.service.dto.OSDTO;
+import com.app.docker.service.mapper.OSMapper;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -50,6 +53,12 @@ public class OSResourceIntTest {
     private OSRepository oSRepository;
 
     @Inject
+    private OSMapper oSMapper;
+
+    @Inject
+    private OSService oSService;
+
+    @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Inject
@@ -66,7 +75,7 @@ public class OSResourceIntTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         OSResource oSResource = new OSResource();
-        ReflectionTestUtils.setField(oSResource, "oSRepository", oSRepository);
+        ReflectionTestUtils.setField(oSResource, "oSService", oSService);
         this.restOSMockMvc = MockMvcBuilders.standaloneSetup(oSResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -97,10 +106,11 @@ public class OSResourceIntTest {
         int databaseSizeBeforeCreate = oSRepository.findAll().size();
 
         // Create the OS
+        OSDTO oSDTO = oSMapper.oSToOSDTO(oS);
 
         restOSMockMvc.perform(post("/api/o-s")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(oS)))
+            .content(TestUtil.convertObjectToJsonBytes(oSDTO)))
             .andExpect(status().isCreated());
 
         // Validate the OS in the database
@@ -120,11 +130,12 @@ public class OSResourceIntTest {
         // Create the OS with an existing ID
         OS existingOS = new OS();
         existingOS.setId(1L);
+        OSDTO existingOSDTO = oSMapper.oSToOSDTO(existingOS);
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restOSMockMvc.perform(post("/api/o-s")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(existingOS)))
+            .content(TestUtil.convertObjectToJsonBytes(existingOSDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Alice in the database
@@ -140,10 +151,11 @@ public class OSResourceIntTest {
         oS.setName(null);
 
         // Create the OS, which fails.
+        OSDTO oSDTO = oSMapper.oSToOSDTO(oS);
 
         restOSMockMvc.perform(post("/api/o-s")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(oS)))
+            .content(TestUtil.convertObjectToJsonBytes(oSDTO)))
             .andExpect(status().isBadRequest());
 
         List<OS> oSList = oSRepository.findAll();
@@ -158,10 +170,11 @@ public class OSResourceIntTest {
         oS.setVersion(null);
 
         // Create the OS, which fails.
+        OSDTO oSDTO = oSMapper.oSToOSDTO(oS);
 
         restOSMockMvc.perform(post("/api/o-s")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(oS)))
+            .content(TestUtil.convertObjectToJsonBytes(oSDTO)))
             .andExpect(status().isBadRequest());
 
         List<OS> oSList = oSRepository.findAll();
@@ -221,10 +234,11 @@ public class OSResourceIntTest {
                 .name(UPDATED_NAME)
                 .version(UPDATED_VERSION)
                 .description(UPDATED_DESCRIPTION);
+        OSDTO oSDTO = oSMapper.oSToOSDTO(updatedOS);
 
         restOSMockMvc.perform(put("/api/o-s")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(updatedOS)))
+            .content(TestUtil.convertObjectToJsonBytes(oSDTO)))
             .andExpect(status().isOk());
 
         // Validate the OS in the database
@@ -242,11 +256,12 @@ public class OSResourceIntTest {
         int databaseSizeBeforeUpdate = oSRepository.findAll().size();
 
         // Create the OS
+        OSDTO oSDTO = oSMapper.oSToOSDTO(oS);
 
         // If the entity doesn't have an ID, it will be created instead of just being updated
         restOSMockMvc.perform(put("/api/o-s")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(oS)))
+            .content(TestUtil.convertObjectToJsonBytes(oSDTO)))
             .andExpect(status().isCreated());
 
         // Validate the OS in the database

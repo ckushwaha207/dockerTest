@@ -13,3 +13,8 @@ entity Tool {
 relationship ManyToMany {
 	OS{tools} to Tool{os}
 }
+
+dto * with mapstruct
+
+// Set service options to all except few
+service all with serviceImpl

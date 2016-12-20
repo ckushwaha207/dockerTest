@@ -4,6 +4,9 @@ import com.app.docker.DockerTestApp;
 
 import com.app.docker.domain.Tool;
 import com.app.docker.repository.ToolRepository;
+import com.app.docker.service.ToolService;
+import com.app.docker.service.dto.ToolDTO;
+import com.app.docker.service.mapper.ToolMapper;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -50,6 +53,12 @@ public class ToolResourceIntTest {
     private ToolRepository toolRepository;
 
     @Inject
+    private ToolMapper toolMapper;
+
+    @Inject
+    private ToolService toolService;
+
+    @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Inject
@@ -66,7 +75,7 @@ public class ToolResourceIntTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         ToolResource toolResource = new ToolResource();
-        ReflectionTestUtils.setField(toolResource, "toolRepository", toolRepository);
+        ReflectionTestUtils.setField(toolResource, "toolService", toolService);
         this.restToolMockMvc = MockMvcBuilders.standaloneSetup(toolResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setMessageConverters(jacksonMessageConverter).build();
@@ -97,10 +106,11 @@ public class ToolResourceIntTest {
         int databaseSizeBeforeCreate = toolRepository.findAll().size();
 
         // Create the Tool
+        ToolDTO toolDTO = toolMapper.toolToToolDTO(tool);
 
         restToolMockMvc.perform(post("/api/tools")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(tool)))
+            .content(TestUtil.convertObjectToJsonBytes(toolDTO)))
             .andExpect(status().isCreated());
 
         // Validate the Tool in the database
@@ -120,11 +130,12 @@ public class ToolResourceIntTest {
         // Create the Tool with an existing ID
         Tool existingTool = new Tool();
         existingTool.setId(1L);
+        ToolDTO existingToolDTO = toolMapper.toolToToolDTO(existingTool);
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restToolMockMvc.perform(post("/api/tools")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(existingTool)))
+            .content(TestUtil.convertObjectToJsonBytes(existingToolDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Alice in the database
@@ -140,10 +151,11 @@ public class ToolResourceIntTest {
         tool.setName(null);
 
         // Create the Tool, which fails.
+        ToolDTO toolDTO = toolMapper.toolToToolDTO(tool);
 
         restToolMockMvc.perform(post("/api/tools")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(tool)))
+            .content(TestUtil.convertObjectToJsonBytes(toolDTO)))
             .andExpect(status().isBadRequest());
 
         List<Tool> toolList = toolRepository.findAll();
@@ -158,10 +170,11 @@ public class ToolResourceIntTest {
         tool.setVersion(null);
 
         // Create the Tool, which fails.
+        ToolDTO toolDTO = toolMapper.toolToToolDTO(tool);
 
         restToolMockMvc.perform(post("/api/tools")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(tool)))
+            .content(TestUtil.convertObjectToJsonBytes(toolDTO)))
             .andExpect(status().isBadRequest());
 
         List<Tool> toolList = toolRepository.findAll();
@@ -221,10 +234,11 @@ public class ToolResourceIntTest {
                 .name(UPDATED_NAME)
                 .version(UPDATED_VERSION)
                 .description(UPDATED_DESCRIPTION);
+        ToolDTO toolDTO = toolMapper.toolToToolDTO(updatedTool);
 
         restToolMockMvc.perform(put("/api/tools")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(updatedTool)))
+            .content(TestUtil.convertObjectToJsonBytes(toolDTO)))
             .andExpect(status().isOk());
 
         // Validate the Tool in the database
@@ -242,11 +256,12 @@ public class ToolResourceIntTest {
         int databaseSizeBeforeUpdate = toolRepository.findAll().size();
 
         // Create the Tool
+        ToolDTO toolDTO = toolMapper.toolToToolDTO(tool);
 
         // If the entity doesn't have an ID, it will be created instead of just being updated
         restToolMockMvc.perform(put("/api/tools")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(tool)))
+            .content(TestUtil.convertObjectToJsonBytes(toolDTO)))
             .andExpect(status().isCreated());
 
         // Validate the Tool in the database

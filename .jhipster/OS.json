@@ -32,7 +32,7 @@
     ],
     "changelogDate": "20161220060728",
     "entityTableName": "os",
-    "dto": "no",
+    "dto": "mapstruct",
     "pagination": "no",
-    "service": "no"
+    "service": "serviceImpl"
 }

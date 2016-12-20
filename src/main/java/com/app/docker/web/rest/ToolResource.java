@@ -1,10 +1,9 @@
 package com.app.docker.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import com.app.docker.domain.Tool;
-
-import com.app.docker.repository.ToolRepository;
+import com.app.docker.service.ToolService;
 import com.app.docker.web.rest.util.HeaderUtil;
+import com.app.docker.service.dto.ToolDTO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +16,10 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing Tool.
@@ -30,23 +31,23 @@ public class ToolResource {
     private final Logger log = LoggerFactory.getLogger(ToolResource.class);
         
     @Inject
-    private ToolRepository toolRepository;
+    private ToolService toolService;
 
     /**
      * POST  /tools : Create a new tool.
      *
-     * @param tool the tool to create
-     * @return the ResponseEntity with status 201 (Created) and with body the new tool, or with status 400 (Bad Request) if the tool has already an ID
+     * @param toolDTO the toolDTO to create
+     * @return the ResponseEntity with status 201 (Created) and with body the new toolDTO, or with status 400 (Bad Request) if the tool has already an ID
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/tools")
     @Timed
-    public ResponseEntity<Tool> createTool(@Valid @RequestBody Tool tool) throws URISyntaxException {
-        log.debug("REST request to save Tool : {}", tool);
-        if (tool.getId() != null) {
+    public ResponseEntity<ToolDTO> createTool(@Valid @RequestBody ToolDTO toolDTO) throws URISyntaxException {
+        log.debug("REST request to save Tool : {}", toolDTO);
+        if (toolDTO.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("tool", "idexists", "A new tool cannot already have an ID")).body(null);
         }
-        Tool result = toolRepository.save(tool);
+        ToolDTO result = toolService.save(toolDTO);
         return ResponseEntity.created(new URI("/api/tools/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("tool", result.getId().toString()))
             .body(result);
@@ -55,22 +56,22 @@ public class ToolResource {
     /**
      * PUT  /tools : Updates an existing tool.
      *
-     * @param tool the tool to update
-     * @return the ResponseEntity with status 200 (OK) and with body the updated tool,
-     * or with status 400 (Bad Request) if the tool is not valid,
-     * or with status 500 (Internal Server Error) if the tool couldnt be updated
+     * @param toolDTO the toolDTO to update
+     * @return the ResponseEntity with status 200 (OK) and with body the updated toolDTO,
+     * or with status 400 (Bad Request) if the toolDTO is not valid,
+     * or with status 500 (Internal Server Error) if the toolDTO couldnt be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/tools")
     @Timed
-    public ResponseEntity<Tool> updateTool(@Valid @RequestBody Tool tool) throws URISyntaxException {
-        log.debug("REST request to update Tool : {}", tool);
-        if (tool.getId() == null) {
-            return createTool(tool);
+    public ResponseEntity<ToolDTO> updateTool(@Valid @RequestBody ToolDTO toolDTO) throws URISyntaxException {
+        log.debug("REST request to update Tool : {}", toolDTO);
+        if (toolDTO.getId() == null) {
+            return createTool(toolDTO);
         }
-        Tool result = toolRepository.save(tool);
+        ToolDTO result = toolService.save(toolDTO);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert("tool", tool.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert("tool", toolDTO.getId().toString()))
             .body(result);
     }
 
@@ -81,24 +82,23 @@ public class ToolResource {
      */
     @GetMapping("/tools")
     @Timed
-    public List<Tool> getAllTools() {
+    public List<ToolDTO> getAllTools() {
         log.debug("REST request to get all Tools");
-        List<Tool> tools = toolRepository.findAll();
-        return tools;
+        return toolService.findAll();
     }
 
     /**
      * GET  /tools/:id : get the "id" tool.
      *
-     * @param id the id of the tool to retrieve
-     * @return the ResponseEntity with status 200 (OK) and with body the tool, or with status 404 (Not Found)
+     * @param id the id of the toolDTO to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the toolDTO, or with status 404 (Not Found)
      */
     @GetMapping("/tools/{id}")
     @Timed
-    public ResponseEntity<Tool> getTool(@PathVariable Long id) {
+    public ResponseEntity<ToolDTO> getTool(@PathVariable Long id) {
         log.debug("REST request to get Tool : {}", id);
-        Tool tool = toolRepository.findOne(id);
-        return Optional.ofNullable(tool)
+        ToolDTO toolDTO = toolService.findOne(id);
+        return Optional.ofNullable(toolDTO)
             .map(result -> new ResponseEntity<>(
                 result,
                 HttpStatus.OK))
@@ -108,14 +108,14 @@ public class ToolResource {
     /**
      * DELETE  /tools/:id : delete the "id" tool.
      *
-     * @param id the id of the tool to delete
+     * @param id the id of the toolDTO to delete
      * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/tools/{id}")
     @Timed
     public ResponseEntity<Void> deleteTool(@PathVariable Long id) {
         log.debug("REST request to delete Tool : {}", id);
-        toolRepository.delete(id);
+        toolService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("tool", id.toString())).build();
     }
 
