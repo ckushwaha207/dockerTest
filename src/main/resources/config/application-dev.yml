@@ -97,3 +97,8 @@ jhipster:
             host: localhost
             port: 5000
             queueSize: 512
+    docker:
+            host: tcp://192.168.99.100:2376
+            tlsVerify: true
+            certPath: C:/Users/chandan.kushwaha/.docker/machine/certs
+            config: C:/Users/chandan.kushwaha/.docker

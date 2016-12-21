@@ -5,9 +5,9 @@ import org.springframework.web.cors.CorsConfiguration;
 
 /**
  * Properties specific to JHipster.
- *
  * <p>
- *     Properties are configured in the application.yml file.
+ * <p>
+ * Properties are configured in the application.yml file.
  * </p>
  */
 @ConfigurationProperties(prefix = "jhipster", ignoreUnknownFields = false)
@@ -32,6 +32,8 @@ public class JHipsterProperties {
     private final Social social = new Social();
 
     private final Ribbon ribbon = new Ribbon();
+
+    private final Docker docker = new Docker();
 
     public Async getAsync() {
         return async;
@@ -71,6 +73,10 @@ public class JHipsterProperties {
 
     public Ribbon getRibbon() {
         return ribbon;
+    }
+
+    public Docker getDocker() {
+        return docker;
     }
 
     public static class Async {
@@ -179,6 +185,7 @@ public class JHipsterProperties {
         public Authentication getAuthentication() {
             return authentication;
         }
+
         public static class Authentication {
 
             private final Jwt jwt = new Jwt();
@@ -446,13 +453,17 @@ public class JHipsterProperties {
 
     private final Logging logging = new Logging();
 
-    public Logging getLogging() { return logging; }
+    public Logging getLogging() {
+        return logging;
+    }
 
     public static class Logging {
 
         private final Logstash logstash = new Logstash();
 
-        public Logstash getLogstash() { return logstash; }
+        public Logstash getLogstash() {
+            return logstash;
+        }
 
         public static class Logstash {
 
@@ -464,21 +475,37 @@ public class JHipsterProperties {
 
             private int queueSize = 512;
 
-            public boolean isEnabled() { return enabled; }
+            public boolean isEnabled() {
+                return enabled;
+            }
 
-            public void setEnabled(boolean enabled) { this.enabled = enabled; }
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
 
-            public String getHost() { return host; }
+            public String getHost() {
+                return host;
+            }
 
-            public void setHost(String host) { this.host = host; }
+            public void setHost(String host) {
+                this.host = host;
+            }
 
-            public int getPort() { return port; }
+            public int getPort() {
+                return port;
+            }
 
-            public void setPort(int port) { this.port = port; }
+            public void setPort(int port) {
+                this.port = port;
+            }
 
-            public int getQueueSize() { return queueSize; }
+            public int getQueueSize() {
+                return queueSize;
+            }
 
-            public void setQueueSize(int queueSize) { this.queueSize = queueSize; }
+            public void setQueueSize(int queueSize) {
+                this.queueSize = queueSize;
+            }
         }
     }
 
@@ -505,6 +532,48 @@ public class JHipsterProperties {
 
         public void setDisplayOnActiveProfiles(String[] displayOnActiveProfiles) {
             this.displayOnActiveProfiles = displayOnActiveProfiles;
+        }
+    }
+
+    public static class Docker {
+        private String host;
+
+        private Boolean tlsVerify;
+
+        private String certPath;
+
+        private String config;
+
+        public String getHost() {
+            return host;
+        }
+
+        public void setHost(String host) {
+            this.host = host;
+        }
+
+        public Boolean getTlsVerify() {
+            return tlsVerify;
+        }
+
+        public void setTlsVerify(Boolean tlsVerify) {
+            this.tlsVerify = tlsVerify;
+        }
+
+        public String getCertPath() {
+            return certPath;
+        }
+
+        public void setCertPath(String certPath) {
+            this.certPath = certPath;
+        }
+
+        public String getConfig() {
+            return config;
+        }
+
+        public void setConfig(String config) {
+            this.config = config;
         }
     }
 }
